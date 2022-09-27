@@ -8,6 +8,7 @@ export default function Task({ task: { id, title, state }, onArchiveTask, onPinT
         <input
           type="checkbox"
           defaultChecked={state === 'TASK_ARCHIVED'}
+          aria-label={state === 'TASK_ARCHIVED' ? 'pinned' : ''}
           disabled={true}
           name="checked"
         />

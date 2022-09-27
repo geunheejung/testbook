@@ -11,7 +11,7 @@ export default {
 const Template = (args) => <Task {...args} />;
 
 export const Default = Template.bind({});
-Default.args = {
+Default.args = { 
   task: {
     id: '1',
     title: 'Test Task',

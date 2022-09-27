@@ -1,11 +1,33 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Task from './Task';
+import { updateTaskState } from '../lib/store'
 
-const TaskList = ({ loading, tasks, onPinTask, onArchiveTask }) => {
-  const events = {
-    onPinTask,
-    onArchiveTask
+const TaskList = ({ loading }) => {
+  const dispatch = useDispatch();
+  const { status } = useSelector(state => state.taskbox);
+
+
+  const tasks = useSelector((state) => {
+    const { taskbox: { tasks } } = state;
+    const tasksInOrder = [
+      ...tasks.filter(task => task.state === 'TASK_PINNED'),
+      ...tasks.filter(task => task.state !== 'TASK_PINNED')
+    ];
+
+    const filteredTasks = tasksInOrder.filter(t => t.state === 'TASK_INBOX' || t.state === 'TASK_PINNED');
+
+    return filteredTasks;
+  })
+
+  const pinTask = (value) => {
+    // We're dispatching the Pinned event back to our store
+    dispatch(updateTaskState({ id: value, newTaskState: 'TASK_PINNED' }));
+  };
+  const archiveTask = (value) => {
+    // We're dispatching the Archive event back to our store
+    dispatch(updateTaskState({ id: value, newTaskState: 'TASK_ARCHIVED' }));
   };
 
   const LoadingRow = (
@@ -44,16 +66,17 @@ const TaskList = ({ loading, tasks, onPinTask, onArchiveTask }) => {
     );
   }
 
-  const tasksInOrder = [
-    ...tasks.filter(task => task.state === 'TASK_PINNED'),
-    ...tasks.filter(task => task.state !== 'TASK_PINNED')
-  ];
   
   return (
     <div className='list-items'>
       {
-        tasksInOrder.map(task => (
-          <Task key={task.id} task={task} {...events} />
+        tasks.map(task => (
+          <Task
+            key={task.id}
+            task={task}
+            onPinTask={task => pinTask(task)}
+            onArchiveTask={task => archiveTask(task)}
+          />
         ))
       }
     </div>
